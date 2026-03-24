@@ -26,38 +26,8 @@
 
     <main>
         <section class="container">
-            <div class="book-list">
-                <!-- Книга 1 -->
-                <article class="book-card">
-                    <div class="book-cover">
-                        <div class="placeholder-cover">Обложка</div>
-                    </div>
-                    <div class="book-info">
-                        <h3>Название книги 1</h3>
-                        <p class="book-status status-complete">✅ Завершено</p>
-                        <p class="book-description">
-                            Краткое описание книги. Аннотация, которая заинтересует читателя.
-                            Жанр, количество глав, год написания.
-                        </p>
-                        <a href="books/book1/index.html" class="btn">Читать</a>
-                    </div>
-                </article>
-
-                <!-- Книга 2 -->
-                <article class="book-card">
-                    <div class="book-cover">
-                        <div class="placeholder-cover">Обложка</div>
-                    </div>
-                    <div class="book-info">
-                        <h3>Название книги 2</h3>
-                        <p class="book-status status-process">🔄 В процессе</p>
-                        <p class="book-description">
-                            Описание второй книги. Черновик, который постепенно становится готовым.
-                            Планируемый срок завершения.
-                        </p>
-                        <a href="books/book2/index.html" class="btn">Читать</a>
-                    </div>
-                </article>
+            <div id="books-list" class="book-list">
+                <p>Загрузка книг...</p>
             </div>
         </section>
     </main>
@@ -67,5 +37,109 @@
             <p>© 2026 Авторский сайт. Все права защищены.</p>
         </div>
     </footer>
+
+    <script>
+        // Простой парсер Markdown
+        function parseMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/\n/gim, '<br>');
+        }
+
+        // Загрузка списка книг
+        async function loadBooks() {
+            const container = document.getElementById('books-list');
+            
+            try {
+                const repo = 'velikiyavtor-cell/author-site';
+                const response = await fetch(`https://api.github.com/repos/${repo}/contents/content/books`);
+                
+                if (response.status === 404) {
+                    container.innerHTML = '<p>Книг пока нет. Будь первым читателем!</p>';
+                    return;
+                }
+                
+                const folders = await response.json();
+                
+                if (!Array.isArray(folders) || folders.length === 0) {
+                    container.innerHTML = '<p>Книг пока нет. Будь первым читателем!</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                
+                for (const folder of folders) {
+                    if (folder.type !== 'dir') continue;
+                    
+                    // Ищем index.md внутри папки книги
+                    const bookResponse = await fetch(`https://api.github.com/repos/${repo}/contents/content/books/${folder.name}/index.md`);
+                    if (bookResponse.status !== 200) continue;
+                    
+                    const bookData = await bookResponse.json();
+                    // GitHub API возвращает контент в base64
+                    const contentText = atob(bookData.content);
+                    
+                    // Парсим frontmatter
+                    const frontmatter = {};
+                    const lines = contentText.split('\n');
+                    let inFrontmatter = false;
+                    let bodyStart = 0;
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        if (lines[i].trim() === '---') {
+                            if (!inFrontmatter) {
+                                inFrontmatter = true;
+                                bodyStart = i + 1;
+                            } else {
+                                break;
+                            }
+                        } else if (inFrontmatter) {
+                            const match = lines[i].match(/^(.*?):\s*(.*)$/);
+                            if (match) {
+                                frontmatter[match[1].trim()] = match[2].trim();
+                            }
+                        }
+                    }
+                    
+                    // Определяем статус для цвета
+                    const statusClass = {
+                        'Завершено': 'status-complete',
+                        'В процессе': 'status-process',
+                        'Черновик': 'status-draft'
+                    }[frontmatter.status] || 'status-process';
+                    
+                    // Создаём карточку книги
+                    const article = document.createElement('article');
+                    article.className = 'book-card';
+                    article.innerHTML = `
+                        <div class="book-cover">
+                            ${frontmatter.cover 
+                                ? `<img src="${frontmatter.cover}" alt="Обложка: ${frontmatter.title}">` 
+                                : `<div class="placeholder-cover">Обложка</div>`
+                            }
+                        </div>
+                        <div class="book-info">
+                            <h3>${frontmatter.title || 'Без названия'}</h3>
+                            <p class="book-status ${statusClass}">${frontmatter.status || 'Статус неизвестен'}</p>
+                            ${frontmatter.genre ? `<p><strong>Жанр:</strong> ${frontmatter.genre}</p>` : ''}
+                            ${frontmatter.year ? `<p><strong>Год:</strong> ${frontmatter.year}</p>` : ''}
+                            <p class="book-description">${frontmatter.excerpt || frontmatter.description?.substring(0, 150) + '...' || 'Описание отсутствует'}</p>
+                            <a href="books/${folder.name}/index.html" class="btn">Читать</a>
+                        </div>
+                    `;
+                    container.appendChild(article);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки книг:', error);
+                container.innerHTML = '<p>Не удалось загрузить книги. Попробуйте позже.</p>';
+            }
+        }
+
+        loadBooks();
+    </script>
 </body>
 </html>
