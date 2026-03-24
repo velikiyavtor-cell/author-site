@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новости | Авторский сайт</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>📰 Новости</h1>
+            <p class="subtitle">Что происходит в творческой мастерской</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="index.html">Главная</a>
+            <a href="news.html">Новости</a>
+            <a href="books.html">Книги</a>
+            <a href="about.html">Об авторе</a>
+            <a href="contact.html">Связь</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="container">
+            <div id="news-list" class="news-list">
+                <!-- Новости загрузятся автоматически -->
+                <p>Загрузка новостей...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Авторский сайт. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Простой скрипт для загрузки новостей из JSON
+        // В будущем здесь будет интеграция с Decap CMS
+        
+        // Пример данных (пока нет CMS)
+        const sampleNews = [
+            {
+                date: '2026-03-23',
+                title: 'Запуск сайта!',
+                text: 'Наконец-то сделал свой авторский сайт. Теперь все книги будут здесь!'
+            },
+            {
+                date: '2026-03-20',
+                title: 'Новая глава готова',
+                text: 'Закончил черновик пятой главы. Скоро выложу на сайт.'
+            }
+        ];
+
+        function displayNews(news) {
+            const container = document.getElementById('news-list');
+            container.innerHTML = '';
+            
+            news.forEach(item => {
+                const article = document.createElement('article');
+                article.className = 'news-item';
+                article.innerHTML = `
+                    <div class="news-date">${formatDate(item.date)}</div>
+                    <h3>${item.title}</h3>
+                    <p>${item.text}</p>
+                `;
+                container.appendChild(article);
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('ru-RU', options);
+        }
+
+        // Загружаем новости
+        displayNews(sampleNews);
+    </script>
+</body>
+</html>

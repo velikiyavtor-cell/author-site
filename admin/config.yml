@@ -1,0 +1,30 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "news"
+    label: "Новости"
+    folder: "content/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Дата", name: "date", widget: "datetime" }
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Текст", name: "body", widget: "markdown" }
+
+  - name: "books"
+    label: "Книги"
+    folder: "content/books"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Название", name: "title", widget: "string" }
+      - { label: "Обложка", name: "cover", widget: "image", required: false }
+      - { label: "Статус", name: "status", widget: "select", options: ["Завершено", "В процессе"] }
+      - { label: "Жанр", name: "genre", widget: "string" }
+      - { label: "Год", name: "year", widget: "number" }
+      - { label: "Описание", name: "description", widget: "markdown" }
