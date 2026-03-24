@@ -48,17 +48,28 @@
         </div>
     </footer>
 
+    <!-- ТЕСТ: Видно ли этот текст? -->
+    <div id="debug-test" style="position:fixed; top:10px; right:10px; background:#ff0; padding:10px; z-index:9999;">
+        🔍 ТЕСТ: Если видишь этот жёлтый блок — скрипты грузятся!
+    </div>
+
     <!-- Netlify Identity Widget -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script>
+      console.log("🚀 Identity widget script loaded");
+      
       if (window.netlifyIdentity) {
+        console.log("✅ window.netlifyIdentity доступен");
         window.netlifyIdentity.on("init", function(user) {
+          console.log("🔄 Identity init, user:", user);
           if (!user) {
             window.netlifyIdentity.on("login", function() {
               document.location.href = "/admin/";
             });
           }
         });
+      } else {
+        console.error("❌ window.netlifyIdentity НЕ доступен!");
       }
     </script>
 </body>
