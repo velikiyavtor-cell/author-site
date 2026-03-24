@@ -21,10 +21,12 @@ collections:
     folder: "content/books"
     create: true
     slug: "{{slug}}"
+    identifier_field: "title"
     fields:
-      - { label: "Название", name: "title", widget: "string" }
+      - { label: "Название книги", name: "title", widget: "string" }
       - { label: "Обложка", name: "cover", widget: "image", required: false }
-      - { label: "Статус", name: "status", widget: "select", options: ["Завершено", "В процессе"] }
-      - { label: "Жанр", name: "genre", widget: "string" }
-      - { label: "Год", name: "year", widget: "number" }
-      - { label: "Описание", name: "description", widget: "markdown" }
+      - { label: "Статус", name: "status", widget: "select", options: ["Завершено", "В процессе", "Черновик"] }
+      - { label: "Жанр", name: "genre", widget: "string", required: false }
+      - { label: "Год написания", name: "year", widget: "number", required: false }
+      - { label: "Краткое описание", name: "excerpt", widget: "text", required: false }
+      - { label: "Полное описание", name: "description", widget: "markdown", required: false }
