@@ -22,6 +22,8 @@ collections:
     create: true
     slug: "{{slug}}"
     identifier_field: "title"
+    # ВАЖНО: создаём папку с index.md внутри
+    path: "{{slug}}/index"
     fields:
       - { label: "Название книги", name: "title", widget: "string" }
       - { label: "Обложка", name: "cover", widget: "image", required: false }
